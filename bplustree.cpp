@@ -156,7 +156,6 @@ int main(int argc, char *argv[])
             cout << "Invalid command\n";
         }
     } while (!close);
-    cout<<"terminating";
     return 0;
 }
 Node::Node()
@@ -278,7 +277,7 @@ void BPTree::insert(int x)
             while (x > virtualNode[i] && i < MAX)
                 i++;
             //make space for new key
-            for (int j = MAX; j > i; j--) 
+            for (int j = MAX; j > i; j--)
             {
                 virtualNode[j] = virtualNode[j - 1];
             }
@@ -318,7 +317,6 @@ void BPTree::insert(int x)
             {
                 //insert new key in parent node
                 insertInternal(newLeaf->key[0], parent, newLeaf);
-                cout<<"Insert internal being called";
             }
         }
     }
@@ -406,7 +404,6 @@ void BPTree::insertInternal(int x, Node *cursor, Node *child)
         {
             //if cursor is a root node, we create a new root
             Node *newRoot = new Node;
-            //newRoot->key[0] = cursor->key[cursor->size];
             newRoot->key[0] = virtualKey[cursor->size];
             newRoot->ptr[0] = cursor;
             newRoot->ptr[1] = newInternal;
@@ -419,7 +416,7 @@ void BPTree::insertInternal(int x, Node *cursor, Node *child)
         {
             //recursion
             //find depth first search to find parent of cursor
-            insertInternal(virtualKey[cursor->size], findParent(root, cursor), newInternal);
+            insertInternal(cursor->key[cursor->size], findParent(root, cursor), newInternal);
         }
     }
 }
@@ -521,10 +518,8 @@ void BPTree::remove(int x)
             }
             return;
         }
-        ///----- my changes=============
-        // cursor->ptr[cursor->size] = cursor->ptr[cursor->size + 1];
-        // cursor->ptr[cursor->size + 1] = NULL;
-        // ------------------- end my changes
+        cursor->ptr[cursor->size] = cursor->ptr[cursor->size + 1];
+        cursor->ptr[cursor->size + 1] = NULL;
         cout << "Deleted " << x << " from leaf node successfully\n";
         if (cursor->size >= (MAX + 1) / 2) //no underflow
         {
@@ -546,20 +541,15 @@ void BPTree::remove(int x)
                     cursor->key[i] = cursor->key[i - 1];
                 }
                 //shift pointer to next leaf
-                
                 cursor->size++;
-                //------ my chnages --- no sibilings for leaf ---
-                // cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
-                // cursor->ptr[cursor->size - 1] = NULL;
-                //---- end my changes
+                cursor->ptr[cursor->size] = cursor->ptr[cursor->size - 1];
+                cursor->ptr[cursor->size - 1] = NULL;
                 //transfer
                 cursor->key[0] = leftNode->key[leftNode->size - 1];
                 //shift pointer of leftsibling
                 leftNode->size--;
-                //----- my changes leaf have no siblings we will think about sequential search later
-                //leftNode->ptr[leftNode->size] = cursor;
-                //leftNode->ptr[leftNode->size + 1] = NULL;
-                //---end my chnages
+                leftNode->ptr[leftNode->size] = cursor;
+                leftNode->ptr[leftNode->size + 1] = NULL;
                 //update parent
                 parent->key[leftSibling] = cursor->key[0];
                 cout << "Transferred " << cursor->key[0] << " from left sibling of leaf node\n";
@@ -602,7 +592,6 @@ void BPTree::remove(int x)
             {
                 leftNode->key[i] = cursor->key[j];
             }
-
             leftNode->ptr[leftNode->size] = NULL;
             leftNode->size += cursor->size;
             leftNode->ptr[leftNode->size] = cursor->ptr[cursor->size];
@@ -776,7 +765,7 @@ void BPTree::removeInternal(int x, Node *cursor, Node *child)
         {
             leftNode->key[i] = cursor->key[j];
         }
-        for (int i = leftNode->size + 1, j = 0; j < cursor->size + 1; j++, i++)
+        for (int i = leftNode->size + 1, j = 0; j < cursor->size + 1; j++. i++)
         {
             leftNode->ptr[i] = cursor->ptr[j];
             cursor->ptr[j] = NULL;
